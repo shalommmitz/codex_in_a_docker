@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+NAME="codex"
+
+# Find container ID by exact name match (running OR stopped)
+CID="$(docker ps -a --filter "name=^/${NAME}$" --format '{{.ID}}' | head -n 1)"
+
+if [[ -z "${CID}" ]]; then
+  echo "[*] No container named '${NAME}' found. Nothing to do."
+  exit 0
+fi
+
+# If it's running, stop it first
+RUNNING="$(docker ps --filter "id=${CID}" --format '{{.ID}}')"
+if [[ -n "${RUNNING}" ]]; then
+  echo "[*] Stopping '${NAME}' (id=${CID})..."
+  docker stop "${CID}" >/dev/null
+fi
+
+echo "[*] Removing container '${NAME}' (id=${CID})..."
+docker rm "${CID}" >/dev/null
+
+echo "[+] Done."
