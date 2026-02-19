@@ -12,12 +12,16 @@ Motivation: make sure codex does not access anything on the machine beside what 
 - Add your user to the 'docker' group DANGER: give you permanent root 
 - Build: . build_docker
 
-## First time authentication using "pro" (the 20$/mo plan, w/o API key)
+## First time authentication by authenticating 
 
-- Run the docker instance: . run_docker
+- This requires the "pro" plan (20$/mo). No API key is used
 
-   host network
-- Connect to the docker: . connect
-- (now insider the docker) login to codex: docker exec -it codex bash
-- (in a different terminal on the host): authenticate:
-   Firefox <the URL copied/paste from the output of the "docker login">
+- Run the docker instance: . run_docker_first_time
+
+- Connect to the docker: . connect_first_time
+
+- A long URL will be displayed. Copy this URL
+
+- In the host, open a browser and past the URL 
+  
+  E.g., `firefox <the URL copied/paste from the output of the "docker login">`
