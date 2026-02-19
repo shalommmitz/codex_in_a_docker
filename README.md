@@ -6,7 +6,7 @@ Motivation: make sure codex does not access anything on the machine beside what 
 
 - Ubuntu (or variant) 22.04
 
-Installation:
+## Installation:
 
 - install docker: sudo apt install -y docker.io
 - Add your user to the 'docker' group DANGER: give you permanent root 
