@@ -12,9 +12,17 @@ Motivation: make sure codex does not access anything on the machine beside what 
 - Add your user to the 'docker' group DANGER: give you permanent root 
 - Build: . build_docker
 
+## Set up API key
+
+Run `. setup_codex_api_key` and enter the API key
+
+NOTE: if you use this to add the API key, you do NOT need to run the next section.
+
 ## First time authentication by authenticating 
 
-- This requires the "pro" plan (20$/mo). No API key is used
+NOTE: do not run the below if you added the API key
+
+- This procedure requires the "pro" plan (20$/mo). No API key is used.
 
 - Run the docker instance: . run_docker_first_time
 
@@ -25,3 +33,7 @@ Motivation: make sure codex does not access anything on the machine beside what 
 - In the host, open a browser and past the URL 
   
   E.g., `firefox <the URL copied/paste from the output of the "docker login">`
+
+  Note: if the host is a VM, you might need to create an SSH tunnel to port 1455
+
+- when done, run "stop_docker" to stop the running "first time" docker
