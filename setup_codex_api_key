@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+CONFIG_DIR="$HOME/.codex-docker"
+AUTH_FILE="$CONFIG_DIR/auth.json"
+
+echo "Codex auth.json Setup"
+echo "----------------------"
+
+# Create directory if needed
+if [ ! -d "$CONFIG_DIR" ]; then
+    echo "Creating directory: $CONFIG_DIR"
+    mkdir -p "$CONFIG_DIR"
+fi
+
+# Secure directory permissions
+chmod 700 "$CONFIG_DIR"
+
+# If auth.json exists, confirm before overwrite
+if [ -f "$AUTH_FILE" ]; then
+    echo
+    echo "An existing auth.json file was found:"
+    echo "  $AUTH_FILE"
+    echo
+    read -rp "Do you want to overwrite it? (yes/no): " confirm
+    case "$confirm" in
+        yes|y|Y)
+            echo "Overwriting existing auth.json..."
+            ;;
+        *)
+            echo "Aborted. Existing auth.json was NOT modified."
+            exit 0
+            ;;
+    esac
+fi
+
+# Prompt for API key (hidden input)
+echo
+read -rsp "Enter your OpenAI API key: " API_KEY
+echo
+
+if [ -z "$API_KEY" ]; then
+    echo "Error: API key cannot be empty."
+    exit 1
+fi
+
+# Write JSON safely
+cat > "$AUTH_FILE" <<EOF
+{
+  "OPENAI_API_KEY": "$API_KEY"
+}
+EOF
+
+# Secure file permissions
+chmod 600 "$AUTH_FILE"
+
+echo
+echo "auth.json successfully written to:"
+echo "  $AUTH_FILE"
+echo
