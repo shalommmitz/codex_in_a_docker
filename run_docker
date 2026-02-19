@@ -1,3 +1,4 @@
+mkdir -p code
 docker run -d --name codex \
   --restart unless-stopped \
   --cap-drop ALL \
@@ -6,7 +7,7 @@ docker run -d --name codex \
   --read-only \
   --tmpfs /tmp:rw,noexec,nosuid,size=1g \
   --tmpfs /run:rw,noexec,nosuid,size=64m \
-  -v "$(readlink -f "$HOME/s/codex_docker/code"):/workspace/code:rw" \
+  -v "$(readlink -f "./code"):/workspace/code:rw" \
   -v "$HOME/.codex-docker:/home/dev/.codex:rw" \
   codex-py:24.04
 
