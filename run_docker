@@ -1,0 +1,14 @@
+docker run -d --name codex \
+  --restart unless-stopped \
+  --cap-drop ALL \
+  --security-opt no-new-privileges:true \
+  --pids-limit 512 \
+  --read-only \
+  --tmpfs /tmp:rw,noexec,nosuid,size=1g \
+  --tmpfs /run:rw,noexec,nosuid,size=64m \
+  -v "$(readlink -f "$HOME/s/codex_docker/code"):/workspace/code:rw" \
+  -v "$HOME/.codex-docker:/home/dev/.codex:rw" \
+  codex-py:24.04
+
+#  --network host \
+#-p 127.0.0.1:1455:1455 \

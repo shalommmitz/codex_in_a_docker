@@ -1,0 +1,4 @@
+# docker exec -it codex bash   (This launches the docker prompt but does not launch codex)
+# The below line is to give the window a name (so we can key map per this win)
+printf '\033]0;CODEX\007'
+docker exec -it codex bash -lc "cd code && codex"

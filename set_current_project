@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+import os, sys, glob
+from textual import on
+from textual.app import App, ComposeResult
+from textual.widgets import Header, Select, OptionList
+
+folders_to_exclude = ["code", "tmp"]
+folders = []
+for folder in os.listdir("."):
+    if not os.path.isdir(folder):
+        continue
+    if folder in folders_to_exclude:
+        continue
+    folders.append(folder)
+
+for idx, folder in enumerate(folders):
+    print("   ",idx, folder)
+ans = input("Enter the number of the folder to be symbolic linked to 'code' > ")
+if not ans.isdigit():
+   print("Answer is not a number - Aborting")
+   exit()
+folder = folders[int(ans)]
+os.system("rm -f code")
+os.system(f"ln -s {folder} code")
