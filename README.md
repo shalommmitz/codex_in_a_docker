@@ -9,16 +9,21 @@ Motivation: make sure codex does not access anything on the machine beside what 
 ## Installation:
 
 - install docker: sudo apt install -y docker.io
-- Add your user to the 'docker' group DANGER: give you permanent root 
-- Build: . build_docker
+- Add your user to the 'docker' group 
 
-## Set up API key
+DANGER: This will give you permanent root rights
+
+- Build the docker: . build_docker
+- Install pip package textual: `pip install textual`
+- Perform one of the two options below:
+
+### Setup API key
 
 Run `. setup_codex_api_key` and enter the API key
 
 NOTE: if you use this to add the API key, you do NOT need to run the next section.
 
-## First time authentication by authenticating 
+### Setup authentication (no API key)
 
 NOTE: do not run the below if you added the API key
 
@@ -37,3 +42,9 @@ NOTE: do not run the below if you added the API key
   Note: if the host is a VM, you might need to create an SSH tunnel to port 1455
 
 - when done, run "stop_docker" to stop the running "first time" docker
+
+## Usage:
+
+- Run `./set_current_project` to select which of the sub-folders will be called 'code' and seen by the docker
+- Run `. connect`
+- When done: `/quit`
