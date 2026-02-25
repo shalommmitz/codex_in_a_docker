@@ -1,4 +1,6 @@
-# Procedure to run codex inside A docker instance
+# How-to: install and run codex inside A docker instance
+
+This repository contains procedure and scripts.
 
 Motivation: make sure codex does not access anything on the machine beside what it should access.
 
@@ -14,7 +16,8 @@ Motivation: make sure codex does not access anything on the machine beside what 
 DANGER: This will give you permanent root rights
 
 - Build the docker: . build_docker
-- Install pip package textual: `pip install textual`
+- Install the Python package "textual": `pip install textual`
+
 - Perform one of the two options below:
 
 ### Setup API key
@@ -45,6 +48,13 @@ NOTE: do not run the below if you added the API key
 
 ## Usage:
 
+### Switching project:
+
 - Run `./set_current_project` to select which of the sub-folders will be called 'code' and seen by the docker
+- Run `. stop_docker;. run_docker`
+
+### Interact with Codex:
+
 - Run `. connect`
+- Interact with Codex
 - When done: `/quit`
