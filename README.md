@@ -1,4 +1,4 @@
-# How-to: install and run codex inside A docker instance
+# How-to: Install and run Codex inside a docker instance
 
 This repository contains procedure and scripts.
 
@@ -7,18 +7,37 @@ Motivation: make sure codex does not access anything on the machine beside what 
 ## Prerequisites:
 
 - Ubuntu (or variant) 22.04
+- On windows, it is recommended to either install WSL2 (gives you a full Ubuntu environment) OR work on virtual machine
 
-## Installation:
+## Dependencies Installation
 
 - install docker: sudo apt install -y docker.io
-- Add your user to the 'docker' group 
-
-DANGER: This will give you permanent root rights
-
-- Build the docker: . build_docker
 - Install the Python package "textual": `pip install textual`
 
-- Perform one of the two options below:
+## Allow regular user to run `docker` commands without `sudo`
+
+- Add your user to the 'docker' group 
+
+  DANGER: This will give you permanent root rights
+
+  `sudo usermod -aG docker user`
+  
+  (replace "user" with your user name)
+
+- Apply the new group membership
+
+  - Option A: log-out and log-in again
+  - Option B: Start a new shell with the new group active:
+  
+    `newgrp docker`
+
+## Build the docker: 
+
+   `. build_docker`
+
+## Setup authentication
+
+Perform ONE of the two options below:
 
 ### Setup API key
 
@@ -46,10 +65,12 @@ NOTE: do not run the below if you added the API key
 
 - when done, run "stop_docker" to stop the running "first time" docker
 
+
 ## Usage:
 
 ### Switching project:
 
+- Create at least one sub-folders that will contain the projects (can be empty for now)
 - Run `./set_current_project` to select which of the sub-folders will be called 'code' and seen by the docker
 - Run `. stop_docker;. run_docker`
 
