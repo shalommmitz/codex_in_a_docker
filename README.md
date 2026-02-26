@@ -11,7 +11,7 @@ Motivation: make sure codex does not access anything on the machine beside what 
 
 ## Dependencies Installation
 
-- install docker: sudo apt install -y docker.io
+- install docker: `sudo apt install -y docker.io`
 - Install the Python package "textual": `pip install textual`
 
 ## Allow regular user to run `docker` commands without `sudo`
