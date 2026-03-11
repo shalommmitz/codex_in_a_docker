@@ -12,8 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
  && rm -rf /var/lib/apt/lists/*
 
 # ---- install Codex CLI (Linux x86_64 musl release tarball) ----
-# Codex README documents the exact Linux x86_64 tarball name and that the archive contains a single binary
-# named codex-x86_64-unknown-linux-musl that you typically rename to `codex`. :contentReference[oaicite:1]{index=1}
+# The release archive contains a single binary named below; install it as `codex`.
 ARG CODEX_TGZ=codex-x86_64-unknown-linux-musl.tar.gz
 ARG CODEX_BIN=codex-x86_64-unknown-linux-musl
 
