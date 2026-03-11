@@ -1,4 +1,31 @@
-mkdir code
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+IMAGE="codex-py:24.04"
+
+if ! docker image inspect "${IMAGE}" >/dev/null 2>&1; then
+  echo "Image '${IMAGE}' not found. Run ./build_docker first." >&2
+  exit 1
+fi
+
+EXISTING_CONTAINER="$(docker ps -a --filter "name=^/codex$" --format '{{.ID}}' | head -n 1)"
+if [[ -n "${EXISTING_CONTAINER}" ]]; then
+  echo "Container 'codex' already exists. Run ./stop_docker first." >&2
+  exit 1
+fi
+
+CODE_PATH="${SCRIPT_DIR}/code"
+if [[ ! -e "${CODE_PATH}" ]]; then
+  mkdir -p "${CODE_PATH}"
+elif [[ ! -d "${CODE_PATH}" ]]; then
+  echo "Path '${CODE_PATH}' must be a directory or a symlink to a directory." >&2
+  exit 1
+fi
+
+mkdir -p "$HOME/.codex-docker"
+chmod 700 "$HOME/.codex-docker"
+
 docker run -d --name codex \
   --restart unless-stopped \
   --cap-drop ALL \
@@ -7,9 +34,7 @@ docker run -d --name codex \
   --read-only \
   --tmpfs /tmp:rw,noexec,nosuid,size=1g \
   --tmpfs /run:rw,noexec,nosuid,size=64m \
-  -v "$(readlink -f "./code"):/workspace/code:rw" \
+  -v "$(readlink -f "${CODE_PATH}"):/workspace/code:rw" \
   -v "$HOME/.codex-docker:/home/dev/.codex:rw" \
   --network host \
-  -p 127.0.0.1:1455:1455 \
-  codex-py:24.04
-
+  "${IMAGE}"

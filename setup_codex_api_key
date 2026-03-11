@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+umask 077
 
 CONFIG_DIR="$HOME/.codex-docker"
 AUTH_FILE="$CONFIG_DIR/auth.json"
