@@ -1,0 +1,7 @@
+mkdir -p tmp
+cp Dockerfile tmp/
+cp .dockerignore tmp/
+cp docker-entrypoint.sh tmp/
+docker build --pull --no-cache \
+  --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" \
+  -t codex-py:24.04 tmp
