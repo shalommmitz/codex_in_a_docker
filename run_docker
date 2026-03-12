@@ -1,4 +1,41 @@
-mkdir -p code
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+IMAGE="codex-py:24.04"
+
+if ! docker image inspect "${IMAGE}" >/dev/null 2>&1; then
+  echo "Image '${IMAGE}' not found. Run ./build_docker first." >&2
+  exit 1
+fi
+
+EXISTING_CONTAINER="$(docker ps -a --filter "name=^/codex$" --format '{{.ID}}' | head -n 1)"
+if [[ -n "${EXISTING_CONTAINER}" ]]; then
+  echo "Container 'codex' already exists. Run ./stop_docker first." >&2
+  exit 1
+fi
+
+CODE_PATH="${SCRIPT_DIR}/code"
+if [[ ! -L "${CODE_PATH}" ]]; then
+  echo "Use ./set_current_project to set the current project - Aborting" >&2
+  exit 1
+fi
+
+if ! RESOLVED_CODE_PATH="$(readlink -f "${CODE_PATH}")"; then
+  echo "Use ./set_current_project to set the current project - Aborting" >&2
+  exit 1
+fi
+
+if [[ ! -d "${RESOLVED_CODE_PATH}" || "${RESOLVED_CODE_PATH}" != "${SCRIPT_DIR}/"* ]]; then
+  echo "Use ./set_current_project to set the current project - Aborting" >&2
+  exit 1
+fi
+
+if [[ ! -d "$HOME/.codex-docker" ]]; then
+  echo "Folder '~/.codex-docker' is missing; you need to setup authentication and see the READE. Aborting." >&2
+  exit 1
+fi
+
 docker run -d --name codex \
   --restart unless-stopped \
   --cap-drop ALL \
@@ -7,9 +44,6 @@ docker run -d --name codex \
   --read-only \
   --tmpfs /tmp:rw,noexec,nosuid,size=1g \
   --tmpfs /run:rw,noexec,nosuid,size=64m \
-  -v "$(readlink -f "./code"):/workspace/code:rw" \
+  -v "${RESOLVED_CODE_PATH}:/workspace/code:rw" \
   -v "$HOME/.codex-docker:/home/dev/.codex:rw" \
-  codex-py:24.04
-
-#  --network host \
-#-p 127.0.0.1:1455:1455 \
+  "${IMAGE}"
