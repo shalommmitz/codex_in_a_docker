@@ -7,8 +7,9 @@ ARG GID=1000
 # ---- base tools ----
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates curl git openssh-client \
-    python3 python3-venv python3-pip \
+    python3 python3-venv python3-pip python3-dev \
     build-essential tini iputils-ping netcat-openbsd \
+    pkg-config libicu-dev ripgrep dnsmasq \
  && rm -rf /var/lib/apt/lists/*
 
 # ---- install Codex CLI (Linux x86_64 musl release tarball) ----
@@ -16,6 +17,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ARG CODEX_TGZ=codex-x86_64-unknown-linux-musl.tar.gz
 ARG CODEX_BIN=codex-x86_64-unknown-linux-musl
 
+# entrypoint wrapper that starts dnsmasq (AAAA-filtering) then launches your normal CMD
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+
+RUN grep -qE '^\s*precedence\s+::ffff:0:0/96\s+100\s*$' /etc/gai.conf 2>/dev/null || printf '\nprecedence ::ffff:0:0/96  100\n' >> /etc/gai.conf
 RUN curl -fL --retry 5 --retry-all-errors -o /tmp/codex.tgz \
       "https://github.com/openai/codex/releases/latest/download/${CODEX_TGZ}" \
  && tar -xzf /tmp/codex.tgz -C /usr/local/bin \
@@ -46,5 +53,5 @@ RUN set -eux; \
 USER dev
 WORKDIR /workspace
 
-ENTRYPOINT ["/usr/bin/tini","--"]
+#ENTRYPOINT ["/usr/bin/tini","--"]
 CMD ["sleep","infinity"]
