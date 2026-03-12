@@ -2,12 +2,12 @@
 
 This repository provides a few scripts for running the Codex CLI inside a locked-down Docker container. The goal is to keep Codex focused on a single mounted workspace instead of your full host machine.
 This ensures Codex (and ChatGPT, to which it communicates) can not see, or act, on anything not intended on the host.
-cccccThe container only persists data in two host locations:
+The container only persists data in two host locations:
 
 - `./code`, mounted as `/workspace/code`
 - `~/.codex-docker`, mounted as `/home/dev/.codex`
 
-All scripts can be run from any working directory; they resolve paths relative to this repository.
+Most scripts can be run from any working directory. `build_docker`, `build_docker_and_update_codex`, and `update_codex` currently assume they are started from this repository root.
 
 ## Prerequisites
 
@@ -46,7 +46,23 @@ Build the local image:
 ./build_docker
 ```
 
-This creates the image `codex-py:24.04`. The script uses a minimal `tmp/` build context so large sibling projects are not sent to `docker build`.
+This creates the image `codex-py:24.04`. The script recreates `tmp_docker_build_folder/` as a minimal build context so large sibling projects are not sent to `docker build`.
+
+## Update Codex Installation
+
+Use this when you want to refresh to the latest base image layers and latest Codex CLI release from the Dockerfile download URL:
+
+```bash
+./update_codex
+```
+
+`./update_codex` runs:
+
+1. `./stop_docker`
+2. `./build_docker_and_update_codex` (`docker build --pull --no-cache`)
+3. `./run_docker`
+
+`./run_docker` preconditions still apply, so ensure `./code` points to a project folder (via `./set_current_project`) and `~/.codex-docker` exists.
 
 ## Configure Authentication
 
@@ -92,6 +108,8 @@ If your host is a remote VM, you may need an SSH tunnel for port `1455`.
 
 ## Start and Use Codex
 
+Before the first normal startup, run `./set_current_project` once so `./code` is a valid symlink target.
+
 Start the normal container:
 
 ```bash
@@ -116,7 +134,7 @@ To stop and remove the container:
 
 ## Choose Which Project Is Mounted
 
-By default, `./run_docker` creates `./code` if it does not exist and mounts that directory.
+`./run_docker` expects `./code` to be a symlink to one sibling project folder.
 
 If you want `./code` to point at one of this repository's sibling project folders instead:
 
@@ -128,14 +146,12 @@ If you want `./code` to point at one of this repository's sibling project folder
    ```
 
 3. Select the folder to link as `./code`.
-4. Restart the container if it is already running:
+4. `./set_current_project` now restarts the environment automatically by running:
+   - `./stop_docker`
+   - `./build_docker`
+   - `./run_docker`
 
-   ```bash
-   ./stop_docker
-   ./run_docker
-   ```
-
-`./set_current_project` replaces `./code` with a symlink. It will refuse to delete a non-empty real `./code` directory.
+`./set_current_project` replaces `./code` with a symlink. It refuses to delete a non-empty real `./code` directory.
 
 ## Security Model
 
@@ -153,5 +169,6 @@ This setup limits what Codex can modify on the host while still allowing it to w
 
 - If `./run_docker` says the image is missing, run `./build_docker`.
 - If `./run_docker` says the `codex` container already exists, run `./stop_docker`.
+- If `./update_codex` fails on startup checks, run `./set_current_project` and ensure `~/.codex-docker` exists.
 - If `./connect` fails, the container is probably not running. Start it with `./run_docker`.
 - If browser login does not complete, confirm that the temporary login container is running and that port `1455` is reachable from your browser host.
