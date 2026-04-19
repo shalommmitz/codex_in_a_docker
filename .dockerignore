@@ -1,3 +1,13 @@
-*
-!Dockerfile
-!.dockerignore
+.git
+**/__pycache__/
+**/*.pyc
+.venv
+venv
+build
+dist
+node_modules
+*.iso
+*.img
+*.qcow2
+*.tar
+*.zip
