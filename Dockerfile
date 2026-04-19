@@ -7,10 +7,15 @@ ARG GID=1000
 # ---- base tools ----
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates curl git openssh-client \
-    python3 python3-venv python3-pip python3-dev \
+    python3 python3-venv python3-pip python3-dev python3-tk \
+    python3-pil python3-pil.imagetk \
     build-essential tini iputils-ping netcat-openbsd \
     pkg-config libicu-dev ripgrep dnsmasq \
+    file xvfb xauth \
+    bubblewrap \
  && rm -rf /var/lib/apt/lists/*
+
+# For GUI-dependent tools in headless containers, run commands via: xvfb-run -a <cmd>
 
 # ---- install Codex CLI (Linux x86_64 musl release tarball) ----
 # The release archive contains a single binary named below; install it as `codex`.

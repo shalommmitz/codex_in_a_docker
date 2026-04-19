@@ -1,8 +1,11 @@
 rm -rf tmp_docker_build_folder
 mkdir -p tmp_docker_build_folder
+
 cp Dockerfile tmp_docker_build_folder/
 cp .dockerignore tmp_docker_build_folder/
 cp docker-entrypoint.sh tmp_docker_build_folder/
+cp SOUL.md tmp_docker_build_folder/
+
 docker build \
   --build-arg UID="$(id -u)" --build-arg GID="$(id -g)" \
   -t codex-py:24.04 tmp_docker_build_folder

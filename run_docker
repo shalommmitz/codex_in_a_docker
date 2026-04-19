@@ -37,12 +37,14 @@ if [[ ! -d "$HOME/.codex-docker" ]]; then
 fi
 
 docker run -d --name codex \
+  --add-host=host.docker.internal:host-gateway \
   --restart unless-stopped \
   --cap-drop ALL \
   --security-opt no-new-privileges:true \
   --pids-limit 512 \
   --read-only \
   --tmpfs /tmp:rw,noexec,nosuid,size=1g \
+  --tmpfs /tmp/.X11-unix:rw,noexec,nosuid,mode=1777,uid=0,gid=0,size=64m \
   --tmpfs /run:rw,noexec,nosuid,size=64m \
   -v "${RESOLVED_CODE_PATH}:/workspace/code:rw" \
   -v "$HOME/.codex-docker:/home/dev/.codex:rw" \
