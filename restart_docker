@@ -1,0 +1,3 @@
+./stop_docker
+./build_docker
+./run_docker
