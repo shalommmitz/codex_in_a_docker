@@ -151,7 +151,7 @@ If you want `./code` to point at one of this repository's sibling project folder
    - `./build_docker`
    - `./run_docker`
 
-`./set_current_project` replaces `./code` with a symlink. It refuses to delete a non-empty real `./code` directory.
+`./set_current_project` replaces `./code` with a symlink. If the selected folder entry is itself a symlink, `./code` is linked to the resolved real target directory rather than to the intermediate symlink. It refuses to delete a non-empty real `./code` directory.
 
 ## Security Model
 

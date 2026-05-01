@@ -38,6 +38,7 @@ Recent commits changed runtime flow and preconditions. Preserve these unless the
 - `run_docker` precondition: resolved symlink target exists and stays within repo root.
 - `run_docker` precondition: `~/.codex-docker` already exists.
 - `set_current_project` now does more than relinking `./code`: it runs `./stop_docker`, `./build_docker`, and `./run_docker`.
+- `set_current_project` resolves the selected folder first; if the menu entry is a symlink, `./code` must point to the resolved real target directory.
 - `run_docker_first_time` is still the only path that intentionally uses `--network host`.
 - `stop_docker` remains idempotent and safe when container does not exist.
 - `connect`/`connect_first_time` expect container name `codex` and run Codex from `/workspace/code`.
@@ -131,3 +132,4 @@ Do not run destructive container commands against the user's active environment 
 - `run_docker` and `run_docker_first_time` are mutually exclusive because both use container name `codex`.
 - `run_docker` now requires `./code` to be a symlink; README and scripts must stay aligned on this.
 - `set_current_project` now performs container lifecycle actions; document this side effect whenever changed.
+- `set_current_project` now resolves a selected symlinked folder to its real target before creating `./code`; keep README and script output aligned with that behavior.
