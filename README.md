@@ -46,7 +46,7 @@ Build the local image:
 ./build_docker
 ```
 
-This creates the image `codex-py:24.04`. The script recreates `tmp_docker_build_folder/` as a minimal build context so large sibling projects are not sent to `docker build`.
+This creates the image `codex-py:24.04`. The Dockerfile installs the native Codex CLI release for the image architecture, supporting `x86_64`/`amd64` and `arm64`/`aarch64` Linux hosts. The script recreates `tmp_docker_build_folder/` as a minimal build context so large sibling projects are not sent to `docker build`.
 
 ## Update Codex Installation
 
@@ -168,6 +168,7 @@ This setup limits what Codex can modify on the host while still allowing it to w
 ## Troubleshooting
 
 - If `./run_docker` says the image is missing, run `./build_docker`.
+- If `./build_docker` says the Codex CLI architecture is unsupported, build on an `x86_64`/`amd64` or `arm64`/`aarch64` host.
 - If `./run_docker` says the `codex` container already exists, run `./stop_docker`.
 - If `./update_codex` fails on startup checks, run `./set_current_project` and ensure `~/.codex-docker` exists.
 - If `./connect` fails, the container is probably not running. Start it with `./run_docker`.

@@ -17,10 +17,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # For GUI-dependent tools in headless containers, run commands via: xvfb-run -a <cmd>
 
-# ---- install Codex CLI (Linux x86_64 musl release tarball) ----
-# The release archive contains a single binary named below; install it as `codex`.
-ARG CODEX_TGZ=codex-x86_64-unknown-linux-musl.tar.gz
-ARG CODEX_BIN=codex-x86_64-unknown-linux-musl
+# ---- install Codex CLI (native Linux musl release tarball) ----
+ARG CODEX_ARCH=
 
 # entrypoint wrapper that starts dnsmasq (AAAA-filtering) then launches your normal CMD
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
@@ -28,12 +26,30 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 
 RUN grep -qE '^\s*precedence\s+::ffff:0:0/96\s+100\s*$' /etc/gai.conf 2>/dev/null || printf '\nprecedence ::ffff:0:0/96  100\n' >> /etc/gai.conf
-RUN curl -fL --retry 5 --retry-all-errors -o /tmp/codex.tgz \
-      "https://github.com/openai/codex/releases/latest/download/${CODEX_TGZ}" \
- && tar -xzf /tmp/codex.tgz -C /usr/local/bin \
- && mv "/usr/local/bin/${CODEX_BIN}" /usr/local/bin/codex \
- && chmod +x /usr/local/bin/codex \
- && rm -f /tmp/codex.tgz
+RUN set -eux; \
+    arch="${CODEX_ARCH:-$(uname -m)}"; \
+    case "${arch}" in \
+        x86_64|amd64) codex_targets="x86_64-unknown-linux-musl" ;; \
+        aarch64|arm64) codex_targets="aarch64-unknown-linux-musl arm64-unknown-linux-musl" ;; \
+        *) echo "Unsupported Codex CLI architecture: ${arch}" >&2; exit 1 ;; \
+    esac; \
+    mkdir -p /tmp/codex-extract; \
+    for target in ${codex_targets}; do \
+        rm -rf /tmp/codex-extract/*; \
+        url="https://github.com/openai/codex/releases/latest/download/codex-${target}.tar.gz"; \
+        if curl -fL --retry 5 --retry-all-errors -o /tmp/codex.tgz "${url}"; then \
+            tar -xzf /tmp/codex.tgz -C /tmp/codex-extract; \
+            codex_bin="$(find /tmp/codex-extract -maxdepth 1 -type f -name 'codex*' | head -n 1)"; \
+            if [ -n "${codex_bin}" ]; then \
+                mv "${codex_bin}" /usr/local/bin/codex; \
+                chmod +x /usr/local/bin/codex; \
+                rm -rf /tmp/codex.tgz /tmp/codex-extract; \
+                exit 0; \
+            fi; \
+        fi; \
+    done; \
+    echo "No compatible Codex CLI release archive found for architecture: ${arch}" >&2; \
+    exit 1
 
 # ---- non-root user that can write into the mounted workspace ----
 RUN set -eux; \

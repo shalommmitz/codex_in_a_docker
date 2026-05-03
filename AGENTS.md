@@ -13,7 +13,7 @@ Small script changes can directly affect local developer machines. Treat behavio
 ## Repository Scope
 
 - `README.md`: operator-facing source of truth. Keep it aligned with actual script behavior.
-- `Dockerfile`: builds image `codex-py:24.04` and creates non-root user `dev` with host UID/GID.
+- `Dockerfile`: builds image `codex-py:24.04`, installs the native Codex CLI release for `x86_64`/`amd64` or `arm64`/`aarch64`, and creates non-root user `dev` with host UID/GID.
 - `.dockerignore`: limits build context contents copied by `build_docker`.
 - `build_docker`: recreates `tmp_docker_build_folder/`, copies build inputs, runs `docker build`.
 - `build_docker_and_update_codex`: rebuilds image with `--pull --no-cache` using `tmp/` context to refresh Codex installation.
@@ -37,6 +37,7 @@ Recent commits changed runtime flow and preconditions. Preserve these unless the
 - `run_docker` precondition: `./code` is a symlink.
 - `run_docker` precondition: resolved symlink target exists and stays within repo root.
 - `run_docker` precondition: `~/.codex-docker` already exists.
+- `Dockerfile` Codex CLI installation supports `x86_64`/`amd64` and `arm64`/`aarch64`; unsupported architectures must fail with a clear build error.
 - `set_current_project` now does more than relinking `./code`: it runs `./stop_docker`, `./build_docker`, and `./run_docker`.
 - `set_current_project` resolves the selected folder first; if the menu entry is a symlink, `./code` must point to the resolved real target directory.
 - `run_docker_first_time` is still the only path that intentionally uses `--network host`.
